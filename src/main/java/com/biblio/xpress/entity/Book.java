@@ -1,6 +1,5 @@
 package com.biblio.xpress.entity;
 
-import com.biblio.xpress.enums.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,8 +18,7 @@ public class Book {
     private String title;
     private String author;
     private Date publicationDate;
-    @NotNull
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
     private Category category;
     private static int numberOfCopies;
 }
