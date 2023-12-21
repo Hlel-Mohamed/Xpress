@@ -16,7 +16,7 @@ public class Borrow {
     private Book book;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
     private Date borrowDate;
     private Date returnDate;
 }
