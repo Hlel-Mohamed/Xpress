@@ -19,4 +19,7 @@ public class Borrow {
     private UserEntity user;
     private Date borrowDate;
     private Date returnDate;
+    private Date returnedDate;
+    private boolean isReturned;
+    private boolean overdue;
 }

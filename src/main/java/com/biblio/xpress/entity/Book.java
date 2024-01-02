@@ -2,10 +2,13 @@ package com.biblio.xpress.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.*;
 
 import java.sql.Date;
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Data
 public class Book {
@@ -20,5 +23,5 @@ public class Book {
     private Date publicationDate;
     @ManyToOne
     private Category category;
-    private static int numberOfCopies;
+    private  int numberOfCopies;
 }
