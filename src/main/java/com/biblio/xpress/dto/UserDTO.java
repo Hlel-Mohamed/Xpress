@@ -1,7 +1,5 @@
 package com.biblio.xpress.dto;
 
-import com.biblio.xpress.util.ValidPassword;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data

@@ -3,6 +3,7 @@ package com.biblio.xpress.controller;
 import com.biblio.xpress.dto.BookDTO;
 import com.biblio.xpress.entity.*;
 import com.biblio.xpress.repository.CategoryRepository;
+import com.biblio.xpress.service.*;
 import com.biblio.xpress.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
