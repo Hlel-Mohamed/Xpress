@@ -1,0 +1,28 @@
+<div th:fragment="search">
+    <form id="searchForm" action="/search" method="GET">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="bookSearch" name="term" placeholder="Search books by title">
+
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="input-group">
+                    <select class="form-select" id="categoryFilter" name="category">
+                        <!-- Populate category options here -->
+                    </select>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('searchForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            this.submit(); // This submits the form to /search
+        });
+    });
+</script>

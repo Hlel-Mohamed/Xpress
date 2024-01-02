@@ -1,0 +1,179 @@
+
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-light">
+
+    <style>
+        .notification-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .notification-content {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            width: 300px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .notification-header,
+        .notification-footer {
+            padding: 10px;
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            background-color: #f9f9f9;
+        }
+
+    </style>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="https://static.vecteezy.com/system/resources/thumbnails/024/043/963/small/book-icon-clipart-transparent-background-free-png.png" alt="Your Logo" width="30" height="24" class="d-inline-block align-text-top" />
+            MyBookStore
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/books/" id="books">
+                        <i class="fas fa-book"></i> Books
+                    </a>
+
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/borrowedBooks" id="borrowed-books">
+                        <i class="fas fa-list-alt"></i> Borrowed Books</a>
+                </li>
+            </ul>
+            <div class="notification-container">
+                <button class="notification-btn" id="notification-button">
+                    <i class="fas fa-bell"></i> Notifications
+                </button>
+                <div class="notification-content" id="notification-content">
+                    <div class="notification-header">Notifications</div>
+                    <div class="notification-list" id="notification-list">
+                        <!-- Notifications content will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/my-cards/" id="profile">
+                        <i class="fa fa-id-card" aria-hidden="true"></i> My Card
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/myCategories" id="">
+                        <i class="fas fa-heart"></i> My Categories
+                    </a>
+                </li>
+                <li class="nav-item" id="membersLink">
+                    <a class="nav-link active" href="/members" >
+                        <i class="fa fa-address-book" aria-hidden="true"></i> Members
+                    </a>
+                </li>
+                <li class="nav-item" id="addBookLink">
+                    <a class="nav-link active" href="/add-book" >
+                        <i class="fa fa-plus" aria-hidden="true"></i> Add Books
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" id="logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css" rel="stylesheet">
+    <script th:inline="javascript">
+
+        function displayToast(message) {
+            // Create a new toast element
+            Toastify({
+                text: message,
+                className: "info",
+                style: {
+                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                },
+                offset: {
+                    x: 50, // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+                    y: 50 // vertical axis - can be a number or a string indicating unity. eg: '2em'
+                },
+            }).showToast();
+        }
+        var socket = new SockJS('/notifications');
+        var stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            const username = localStorage.getItem('username');
+            stompClient.subscribe('/user/' + username + '/topic/notification', function (notification) {
+                console.log('Received Notification: ' + notification.body);
+                const notificationMessage = "🔔 "+notification.body;
+                displayToast(notificationMessage);
+                getNotifications()
+            });
+        });
+    </script>
+    <script>
+        const role = localStorage.getItem('dashboard');
+        console.log("Role:", role); // Checking the role in the console
+        function toggleMembersLinkVisibility() {
+            const membersLink = document.getElementById('membersLink');
+            const addBookLink = document.getElementById('addBookLink');
+
+            if (role === 'admin-dashboard'||role === 'librarian-dashboard') {
+                console.log("member 1 "+role);
+                membersLink.style.display = 'block';
+                addBookLink.style.display = 'block';
+
+            } else {
+                console.log("member 2 "+role);
+                membersLink.style.display = 'none';
+                addBookLink.style.display = 'none';
+
+            }
+        }
+        toggleMembersLinkVisibility();
+
+    </script>
+    <script th:src="@{/js/notification.js}" ></script>
+    <script>getNotifications()</script>
+</nav>
+
+
