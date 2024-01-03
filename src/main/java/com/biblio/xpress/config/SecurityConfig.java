@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -43,11 +42,34 @@ public class SecurityConfig {
                                         "/swagger-ui.html").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/css/style.css").permitAll()
+                                .requestMatchers("/js/**").permitAll()
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers("/register").permitAll()
                                 .requestMatchers("/member-dashboard").permitAll()
                                 .requestMatchers("/librarian-dashboard").permitAll()
                                 .requestMatchers("/admin-dashboard").permitAll()
+                                .requestMatchers("/add-book").permitAll()
+                                .requestMatchers("/add-new-book").permitAll()
+                                .requestMatchers("/members/**").permitAll()
+                                .requestMatchers("/books/**").permitAll()
+                                .requestMatchers("/borrowedBooks/**").permitAll()
+                                .requestMatchers("/borrowed/**").permitAll()
+                                .requestMatchers("/notifications/**").permitAll()
+                                .requestMatchers("/my-notifications/**").permitAll()
+                                .requestMatchers("/my-card/").permitAll()
+                                .requestMatchers("/my-cards/").permitAll()
+                                .requestMatchers("/myCategories").permitAll()
+                                .requestMatchers("/newCategory/**").permitAll()
+                                .requestMatchers("/myFavCategories").permitAll()
+                                .requestMatchers("/AllCategories").permitAll()
+                                .requestMatchers("/Categories").permitAll()
+                                .requestMatchers("/search").permitAll()
+
+
+
+
+
+
                                 .anyRequest().authenticated()
                 ).formLogin(AbstractHttpConfigurer::disable)
                 .logout(LogoutConfigurer::permitAll);

@@ -1,10 +1,8 @@
 package com.biblio.xpress.controller;
 
 import com.biblio.xpress.config.JWTGenerator;
-import com.biblio.xpress.dto.AuthResponseDTO;
 import com.biblio.xpress.dto.LoginDTO;
 import com.biblio.xpress.dto.RegisterDTO;
-import com.biblio.xpress.dto.UserDTO;
 import com.biblio.xpress.entity.UserEntity;
 import com.biblio.xpress.enums.Role;
 import com.biblio.xpress.exception.EmailTakenException;
@@ -15,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -66,7 +63,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public RedirectView login(@ModelAttribute LoginDTO loginDto, HttpSession session) {
+    public ResponseEntity<String> login(@ModelAttribute LoginDTO loginDto, HttpSession session) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsername(),
                 loginDto.getPassword()));
@@ -76,11 +73,11 @@ public class AuthController {
         System.out.println("Stored JWT token in session: " + token);
         UserEntity user = userRepository.findByUsername(loginDto.getUsername()).get();
         if (user.getRole() == Role.ADMIN) {
-            return new RedirectView("/admin-dashboard");
+            return ResponseEntity.ok().body("admin-dashboard" + "|" + token+"|"+user.getUsername());
         } else if (user.getRole() == Role.LIBRARIAN) {
-            return new RedirectView("/librarian-dashboard");
+            return ResponseEntity.ok().body("librarian-dashboard" + "|" + token+"|"+user.getUsername());
         } else {
-            return new RedirectView("/member-dashboard");
+            return ResponseEntity.ok().body("member-dashboard" + "|" + token+"|"+user.getUsername());
         }
     }
 
