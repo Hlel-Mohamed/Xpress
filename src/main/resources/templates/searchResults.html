@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"  />
+
+    <!-- Bootstrap JavaScript -->
+
+    <style>
+        .book-card {
+            margin-bottom: 15px;
+            width: 14rem; /* Adjust the card width */
+        }
+        .book-card img {
+            height: 150px; /* Adjust the image height */
+            object-fit: cover; /* Ensures the image covers the entire space */
+            transition: transform 0.5s ease; /* Adds transition effect */
+        }
+        .book-card .card-body {
+            padding: 1rem;
+            text-align: center;
+        }
+        .book-card .card-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .book-card .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .book-card img:hover {
+            transform: scale(1.05); /* Increases image size on hover */
+        }
+        .book-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 10px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<body>
+<div th:replace="navbar.html :: navbar">
+
+</div>
+<div class="container">
+
+    <br>
+    <div th:replace="search.html :: search"></div>
+
+    <div class="row">
+        <div class="book-container" >
+            <div class="card book-card" th:each="book : ${searchResults}">
+                <img src="https://img.freepik.com/free-vector/hand-drawn-flat-design-stack-books-illustration_23-2149330605.jpg" alt="Book Image">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${book.title}"></h5>
+                    <p class="card-text"  >
+                        ISBN : <span th:text="${book.isbn}"></span>
+                    </p>
+                    <p class="card-text"  >
+                        Author : <span th:text="${book.author}"></span>
+                    </p>
+                    <p class="card-text">
+                        Number Of Copies :
+                        <span th:if="${book.numberOfCopies > 0}" th:text="${book.numberOfCopies}"></span>
+                        <span th:if="${book.numberOfCopies == 0}">Not Available</span>
+                    </p>
+                    <button type="button"
+                            th:if="${book.numberOfCopies > 0}"
+                            th:onclick="'borrowBook(\'' + ${book.id} + '\')'"
+                            class="btn btn-primary">
+                        Borrow
+                    </button>
+                    <button type="button"
+                            th:if="${book.numberOfCopies == 0}"
+                            th:onclick="'reserveBook(\'' + ${book.id} + '\')'"
+                            class="btn btn-secondary">
+                        Reserve
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css" rel="stylesheet">
+
+
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const categoryFilter = document.getElementById('categoryFilter');
+
+        // Function to fetch categories and populate the select element
+        function fetchAndPopulateCategories() {
+            const token = localStorage.getItem('jwtToken');
+            const url = '/Categories';
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to fetch categories');
+                    }
+                })
+                .then(categories => {
+                    // Clear previous options
+                    categoryFilter.innerHTML = '';
+
+                    // Populate options based on fetched categories
+                    categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id; // Assuming category id as the value
+                        option.textContent = category.name; // Assuming category name property
+
+                        categoryFilter.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching categories:', error);
+                });
+        }
+
+        // Call the function to fetch and populate categories
+        fetchAndPopulateCategories();
+    });
+
+    function borrowBook(bookId) {
+        const token = localStorage.getItem("jwtToken");
+        const url = `/books/borrow/${bookId}`;
+        console.log(bookId);
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok){
+                    Toastify({
+                        text: "You have borrowed the book successfully",
+                        className: "info",
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        },
+                        offset: {
+                            x: 50, // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+                            y: 50 // vertical axis - can be a number or a string indicating unity. eg: '2em'
+                        },
+                    }).showToast();
+                }
+                else{
+                    Toastify({
+                        text: "Your membership card is not valid",
+                        className: "danger",
+                        style: {
+                            background: "linear-gradient(to right, red, darkred)",
+                        },
+                        offset: {
+                            x: 50, // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+                            y: 50 // vertical axis - can be a number or a string indicating unity. eg: '2em'
+                        },
+                    }).showToast();
+                }
+            })
+            .catch(error => {
+                console.log(err)
+            });
+    }
+    function reserveBook(bookId) {
+        const token = localStorage.getItem("jwtToken");
+        const url = `/books/reserve/${bookId}`;
+        console.log(bookId);
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok){
+                    Toastify({
+                        text: "You have reserved the book successfully",
+                        className: "info",
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        },
+                        offset: {
+                            x: 50, // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+                            y: 50 // vertical axis - can be a number or a string indicating unity. eg: '2em'
+                        },
+                    }).showToast();
+                }
+                else{
+                    Toastify({
+                        text: "Your membership card is not valid",
+                        className: "danger",
+                        style: {
+                            background: "linear-gradient(to right, red, darkred)",
+                        },
+                        offset: {
+                            x: 50, // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+                            y: 50 // vertical axis - can be a number or a string indicating unity. eg: '2em'
+                        },
+                    }).showToast();
+                }
+            })
+            .catch(error => {
+                console.log(err)
+            });
+    }
+</script>
+</body>
+</html>

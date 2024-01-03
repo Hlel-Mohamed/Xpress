@@ -16,4 +16,5 @@ public class Reservation {
     @JoinColumn(name = "user_id")
     private UserEntity user;
     private boolean isAvailable;
+    private int notificationCount;
 }
