@@ -13,8 +13,6 @@ public class RegisterDTO {
     private String firstName;
     @NotNull @NotEmpty @NotBlank
     private String lastName;
-    @NotNull @NotEmpty @NotBlank
-    private String username;
     private String phone;
     private String address;
     @NotNull @NotEmpty @NotBlank @Email

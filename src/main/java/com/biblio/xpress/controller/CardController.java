@@ -31,7 +31,7 @@ public class CardController {
     @GetMapping("/my-card/")
     public ResponseEntity<Card> getMyCard(Authentication authentication) {
 
-        Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+        Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
         System.out.println(user.toString());
         if (user.isPresent()) {
             Card card = cardService.getMyCard(user.get());

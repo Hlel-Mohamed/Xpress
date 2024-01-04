@@ -19,7 +19,6 @@ public class UserMapper {
     public UserDTO convertToDTO(UserEntity userEntity) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(userEntity.getId());
-        userDTO.setUsername(userEntity.getUsername());
         userDTO.setFirstName(userEntity.getFirstName());
         userDTO.setLastName(userEntity.getLastName());
         userDTO.setEmail(userEntity.getEmail());
@@ -33,7 +32,6 @@ public class UserMapper {
     public UserEntity convertToEntity(UserDTO userDTO){
         UserEntity userEntity = new UserEntity();
         userEntity.setId(userDTO.getId());
-        userEntity.setUsername(userDTO.getUsername());
         userEntity.setFirstName(userDTO.getFirstName());
         userEntity.setLastName(userDTO.getLastName());
         userEntity.setEmail(userDTO.getEmail());

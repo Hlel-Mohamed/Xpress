@@ -65,7 +65,7 @@ public class BookController {
     //Get My Borrowed Books
     @GetMapping("/borrowed/")
     public ResponseEntity<List<Borrow>> showMyBorrowedBooks(Authentication authentication) {
-        Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+        Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
 
         if (user.isPresent()) {
             List<Borrow> borrowedBooks = borrowService.getMyBorrowedBooks(user.get());
@@ -82,7 +82,7 @@ public class BookController {
     //Reserve A book
     @PostMapping(value="/books/reserve/{id}")
     public ResponseEntity<Reservation> ReserveBook(@PathVariable Long id, Authentication authentication, Principal principal) {
-        Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+        Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
         Optional<Book> book = bookService.getBookById(id);
         Card card = cardService.getMyCard(user.get());
         Reservation reservation = new Reservation();
@@ -114,7 +114,7 @@ public class BookController {
     //Borrow a book request
     @PostMapping(value="/books/borrow/{id}")
     public ResponseEntity<List<Borrow>> BorrowBook(@PathVariable Long id,Authentication authentication, Principal principal) {
-        Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+        Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
         Card card = cardService.getMyCard(user.get());
         System.out.println(card.isValid());
         if (card.isValid()) {
@@ -141,7 +141,7 @@ public class BookController {
     //Return a book
     @PostMapping(value="/books/unborrow/{BookId}/{borrowId}")
     public ResponseEntity<Book> unBorrowBook(@PathVariable Long BookId, @PathVariable Long borrowId, Authentication authentication, Principal principal) {
-        Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+        Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
         Optional<Book> book = bookService.getBookById(BookId);
         book.get().setNumberOfCopies(book.get().getNumberOfCopies()+1);
         bookService.saveBook(book.get());

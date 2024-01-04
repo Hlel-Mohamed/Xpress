@@ -1,5 +1,7 @@
 package com.biblio.xpress.config;
 
+import com.biblio.xpress.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,23 +22,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthEntryPoint authEntryPoint;
-    private final CustomUserDetailsService customUserDetailsService;
-    @Autowired
-    public SecurityConfig(JwtAuthEntryPoint authEntryPoint, CustomUserDetailsService customUserDetailsService) {
-        this.authEntryPoint = authEntryPoint;
-        this.customUserDetailsService = customUserDetailsService;
-    }
+    private final UserRepository userRepository;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(requests ->
                         requests
                                 .requestMatchers(
@@ -43,11 +41,10 @@ public class SecurityConfig {
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/css/style.css").permitAll()
                                 .requestMatchers("/js/**").permitAll()
-                                .requestMatchers("/login").permitAll()
                                 .requestMatchers("/register").permitAll()
-                                .requestMatchers("/member-dashboard").permitAll()
-                                .requestMatchers("/librarian-dashboard").permitAll()
-                                .requestMatchers("/admin-dashboard").permitAll()
+                                .requestMatchers("/member-dashboard").hasAuthority("MEMBER")
+                                .requestMatchers("/librarian-dashboard").hasAuthority("LIBRARIAN")
+                                .requestMatchers("/admin-dashboard").hasAuthority("ADMIN")
                                 .requestMatchers("/add-book").permitAll()
                                 .requestMatchers("/add-new-book").permitAll()
                                 .requestMatchers("/members/**").permitAll()
@@ -65,20 +62,16 @@ public class SecurityConfig {
                                 .requestMatchers("/Categories").permitAll()
                                 .requestMatchers("/search").permitAll()
 
-
-
-
-
-
                                 .anyRequest().authenticated()
-                ).formLogin(AbstractHttpConfigurer::disable)
-                .logout(LogoutConfigurer::permitAll);
+                ).formLogin(login->login
+                        .loginPage("/login")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/login")
+                        .permitAll());
         return http.build();
     }
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -86,8 +79,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public  JWTAuthenticationFilter jwtAuthenticationFilter() {
-        return new JWTAuthenticationFilter();
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+            }
+        };
     }
 
 }

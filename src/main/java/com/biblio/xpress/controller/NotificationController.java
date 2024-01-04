@@ -32,7 +32,7 @@ public class NotificationController {
     @GetMapping("/my-notifications/")
     public ResponseEntity<List<Notification>> showMyNotifications(Authentication authentication) {
 
-        Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+        Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
         if (user.isPresent()) {
             List<Notification> notifications = notificationService.getMyNotifications(user.get());
             return ResponseEntity.ok(notifications);

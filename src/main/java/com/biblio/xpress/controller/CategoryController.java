@@ -40,7 +40,7 @@ public class CategoryController {
     @GetMapping("/myFavCategories")
     public ResponseEntity<List<Category>> getMyCategory(Authentication authentication, Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
-            Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+            Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
             if (user.isPresent()) {
                 List<Category> userCategory = user.get().getFavoriteCategories();
                 return ResponseEntity.ok(userCategory);
@@ -55,7 +55,7 @@ public class CategoryController {
     @GetMapping("/Categories")
     public ResponseEntity<List<Category>> getAllCategories(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+            Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
             if (user.isPresent()) {
                 List<Category> categories = categoryService.getAllCategories();
                 return ResponseEntity.ok(categories);
@@ -70,7 +70,7 @@ public class CategoryController {
     //Add a new Category to my favorite category list
     @PostMapping("/newCategory/{categoryId}")
     public ResponseEntity<String> addNewCategory(@PathVariable Long categoryId, Authentication authentication){
-        Optional<UserEntity> user = userService.findUserByUsername(authentication.getName());
+        Optional<UserEntity> user = userService.findUserByEmail(authentication.getName());
         if (user.isPresent()) {
             Category category = categoryService.getCategoryById(categoryId);
             if (category!=null) {
