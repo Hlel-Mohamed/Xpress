@@ -50,9 +50,10 @@ public class CategoryController {
     }
 
     @GetMapping("/delete_category/{id}")
-    public void deleteCategory(@PathVariable("id") Long id){
+    public String deleteCategory(@PathVariable("id") Long id){
         Category deleteCategory = categoryServiceImp.getById(id);
         categoryServiceImp.delete(deleteCategory);
+        return "redirect:/category/all";
     }
 
 }

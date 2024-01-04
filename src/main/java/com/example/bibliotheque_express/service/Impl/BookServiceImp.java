@@ -49,4 +49,9 @@ public class BookServiceImp implements BookService {
     public List<Book> getBooksByCategoryId(Long categoryId) {
         return bookRepository.findByCategory_Id(categoryId);
     }
+
+
+    public long getTotalBooks() {
+        return bookRepository.count();
+    }
 }

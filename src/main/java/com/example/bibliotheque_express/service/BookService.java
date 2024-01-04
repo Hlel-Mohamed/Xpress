@@ -13,5 +13,6 @@ public interface BookService {
     void delete(Book book);
     List<Book> getBooksByCategoryId(Long categoryId);
 
+    long getTotalBooks();
 
 }

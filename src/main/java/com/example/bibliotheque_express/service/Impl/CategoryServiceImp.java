@@ -39,4 +39,8 @@ public class CategoryServiceImp implements CategoryService {
     public void delete(Category category) {
         categoryRepo.delete(category);
     }
+
+    public long getTotalCategory(){
+        return categoryRepo.count();
+    }
 }
